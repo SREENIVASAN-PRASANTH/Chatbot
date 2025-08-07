@@ -1,5 +1,6 @@
 import React from 'react'
 import ChatBotIcon from './components/ChatBotIcon'
+import ChatForm from './components/ChatForm'
 
 const App = () => {
   return (
@@ -8,7 +9,7 @@ const App = () => {
 
         {/* chatbot header */}
         <div className="chat-header">
-          <div className="headerInfo">
+          <div className="header-info">
             <ChatBotIcon/>
             <h2 className = "logo-text">Chatbot</h2>  
           </div>
@@ -36,13 +37,7 @@ const App = () => {
 
         {/* chatbot footer */}
         <div className="chatbot-footer">
-          <form action="#" className="chat-form">
-            <input type="text" placeholder = "Message...." className="message-input" required />
-
-            <button className="material-symbols-rounded">
-              arrow_upward
-            </button>
-          </form>
+          <ChatForm/>
         </div>
 
 
