@@ -1,18 +1,33 @@
 import React from 'react'
 import { useRef } from 'react';
 
-const ChatForm = () => {
+const ChatForm = ({chatHistory, setChatHistory, generateBotResponse}) => {
 
     const inputRef = useRef();
 
-    const handleFormSubmit = (e) =>{
+    const handleFormSubmit = (e) =>{ 
         e.preventDefault();
         const userMessage = inputRef.current.value.trim();
 
         if(!userMessage) return;
+        inputRef.current.value = "";
 
-        console.log(userMessage);
+        // update chat history with user message
+        setChatHistory((history) => [...history, {role : "user", text: userMessage}]);
 
+
+        // delay 600ms before showing thinking.. message and generating reespone
+        setTimeout(() => {
+
+          // add thinking placeholder for the bot response
+          setChatHistory((history) => [...history, {role : "model", text: "Thinking..."}])
+
+          //call the function to generate bot response
+          generateBotResponse([...chatHistory, {role:"user", text: userMessage}]);
+        }
+        , 600);
+
+        
     }
 
 

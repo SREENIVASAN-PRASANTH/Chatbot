@@ -1,8 +1,52 @@
 import React from 'react'
+import {useState} from 'react'
 import ChatBotIcon from './components/ChatBotIcon'
 import ChatForm from './components/ChatForm'
+import ChatMessage from './components/ChatMessage'
+import { useEffect, useRef } from 'react'
 
 const App = () => {
+
+  const [chatHistory, setChatHistory] = useState([]);
+  const chatBodyRef = useRef();
+
+
+  const generateBotResponse = async (history) => {
+
+    //helper function to update chat history
+    const updateHistory = (text) => {
+      setChatHistory(prev => [...prev.filter(msg => msg.text !== "Thinking..."), {role: "model", text}])
+    }
+
+    //format chat history for Api request
+    history = history.map(({role, text}) => ({role, parts :[{text}]}));
+
+    const requestOptions = {
+      method: "POST",
+      headers: {"Content-Type" : "application/json"},
+      body: JSON.stringify({contents: history})
+    }
+
+    try{
+      //make api call to get bot response
+      const response = await fetch(import.meta.env.VITE_API_URL, requestOptions);
+      const data = await response.json();
+      if(!response.ok) throw new Error(data.error.message || "Something went wrong");
+
+      //clean and update chat history with bot response
+      const apiResponseText = data.candidates[0].content.parts[0].text.replace(/\*\*(.*?)\*\*/g, "$1").trim();
+
+      updateHistory(apiResponseText);
+    }
+    catch(error){
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    chatBodyRef.current.scrollTo({top: chatBodyRef.current.scrollHeight, behaviour: "smooth"});
+  }, [chatHistory]);
+
   return (
     <div className="container">
       <div className="chatbot-popup">
@@ -20,7 +64,7 @@ const App = () => {
 
 
         {/* chatbot body */}
-        <div className="chat-body">
+        <div ref = {chatBodyRef} className="chat-body">
           <div className="message bot-message">
             <ChatBotIcon/>
             <p className="message-text">
@@ -28,16 +72,17 @@ const App = () => {
             </p>
           </div>
 
-          <div className="message user-message">
-            <p className="message-text">
-              Need help in contact submission
-            </p>
-          </div>
+          {/* Render the chat history  dynamically */}
+          {chatHistory.map((chat, index) => (
+            <ChatMessage key = {index} chat = {chat}/>
+          ))}
+
+          
         </div>
 
         {/* chatbot footer */}
         <div className="chatbot-footer">
-          <ChatForm/>
+          <ChatForm chatHistory = {chatHistory} setChatHistory = {setChatHistory} generateBotResponse = {generateBotResponse}/>
         </div>
 
 
