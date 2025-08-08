@@ -4,18 +4,26 @@ import ChatBotIcon from './components/ChatBotIcon'
 import ChatForm from './components/ChatForm'
 import ChatMessage from './components/ChatMessage'
 import { useEffect, useRef } from 'react'
+import {companyInfo} from "./companyInfo"
 
 const App = () => {
 
-  const [chatHistory, setChatHistory] = useState([]);
+  const [chatHistory, setChatHistory] = useState([
+    {
+      hideInChat: true,
+      role: "model",
+      text: companyInfo,
+    },
+  ]);
+  const [showChatbot, setShowChatbot] = useState(false);
   const chatBodyRef = useRef();
 
 
   const generateBotResponse = async (history) => {
 
     //helper function to update chat history
-    const updateHistory = (text) => {
-      setChatHistory(prev => [...prev.filter(msg => msg.text !== "Thinking..."), {role: "model", text}])
+    const updateHistory = (text, isError = false) => {
+      setChatHistory(prev => [...prev.filter(msg => msg.text !== "Thinking..."), {role: "model", text, isError}])
     }
 
     //format chat history for Api request
@@ -39,7 +47,8 @@ const App = () => {
       updateHistory(apiResponseText);
     }
     catch(error){
-      console.log(error);
+      updateHistory(error.message, true);
+      
     }
   }
 
@@ -48,7 +57,12 @@ const App = () => {
   }, [chatHistory]);
 
   return (
-    <div className="container">
+    <div className= {`container ${showChatbot ? "show-chatbot":""}`}>
+      <button onClick = {() => setShowChatbot(prev => !prev)} id="chatbot-toggler">
+        <span className="material-symbols-rounded">mode_comment</span>
+        <span className="material-symbols-rounded">close</span>
+      </button>
+
       <div className="chatbot-popup">
 
         {/* chatbot header */}
@@ -57,7 +71,7 @@ const App = () => {
             <ChatBotIcon/>
             <h2 className = "logo-text">Chatbot</h2>  
           </div>
-          <button className="material-symbols-rounded">
+          <button onClick = {() => setShowChatbot(prev => !prev)} className="material-symbols-rounded">
             keyboard_arrow_down
           </button>
         </div>
