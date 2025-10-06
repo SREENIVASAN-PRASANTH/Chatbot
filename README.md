@@ -6,6 +6,9 @@ The chatbot is fully responsive and can be used on both desktop and mobile devic
 
 Live Demo: https://prasanth-chatbot.netlify.app/
 
+<img width="526" height="699" alt="image" src="https://github.com/user-attachments/assets/9c750d33-a2d9-456f-90d6-50bd5bb17f60" />
+
+
 ---
 
 ## ✨ Features
